@@ -11,10 +11,13 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import { Plan, useUserPlan } from "../hooks/useQueries";
+import BgRemoverModal from "./BgRemoverModal";
+import BulkConverterModal from "./BulkConverterModal";
+import ImgEnhancerModal from "./ImgEnhancerModal";
+import ImgGeneratorModal from "./ImgGeneratorModal";
 import LoginModal from "./LoginModal";
+import PngToPdfModal from "./PngToPdfModal";
 import UpgradeModal from "./UpgradeModal";
-
-type ToolStatus = "idle" | "processing" | "done";
 
 const tools = [
   {
@@ -108,7 +111,11 @@ export default function Tools() {
   const sectionRef = useReveal();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
-  const [toolStatus, setToolStatus] = useState<Record<string, ToolStatus>>({});
+  const [pngToPdfOpen, setPngToPdfOpen] = useState(false);
+  const [bgRemoverOpen, setBgRemoverOpen] = useState(false);
+  const [imgEnhancerOpen, setImgEnhancerOpen] = useState(false);
+  const [imgGeneratorOpen, setImgGeneratorOpen] = useState(false);
+  const [bulkConverterOpen, setBulkConverterOpen] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const { identity, loginStatus } = useInternetIdentity();
   const isAuthenticated = loginStatus === "success" && !!identity;
@@ -123,19 +130,29 @@ export default function Tools() {
       setUpgradeOpen(true);
       return;
     }
-    setToolStatus((prev) => ({ ...prev, [tool.id]: "processing" }));
-    setTimeout(() => {
-      setToolStatus((prev) => ({ ...prev, [tool.id]: "done" }));
-      setTimeout(() => {
-        setToolStatus((prev) => ({ ...prev, [tool.id]: "idle" }));
-      }, 2000);
-    }, 2000);
+    if (tool.id === "png-to-pdf") {
+      setPngToPdfOpen(true);
+      return;
+    }
+    if (tool.id === "bg-remover") {
+      setBgRemoverOpen(true);
+      return;
+    }
+    if (tool.id === "img-enhancer") {
+      setImgEnhancerOpen(true);
+      return;
+    }
+    if (tool.id === "img-generator") {
+      setImgGeneratorOpen(true);
+      return;
+    }
+    if (tool.id === "bulk-converter") {
+      setBulkConverterOpen(true);
+      return;
+    }
   };
 
   const getButtonState = (tool: (typeof tools)[0]) => {
-    const status = toolStatus[tool.id] || "idle";
-    if (status === "processing") return "processing";
-    if (status === "done") return "done";
     if (!isAuthenticated) return "guest";
     if (tool.plan === "pro" && plan !== Plan.pro) return "locked";
     return "active";
@@ -281,14 +298,7 @@ export default function Tools() {
                 <button
                   type="button"
                   onClick={() => handleToolClick(tool)}
-                  disabled={btnState === "processing"}
-                  className={`w-full py-3 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-                    btnState === "processing"
-                      ? "btn-processing cursor-not-allowed"
-                      : btnState === "done"
-                        ? "btn-done"
-                        : ""
-                  }`}
+                  className="w-full py-3 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2"
                   style={{
                     background: btnBackground,
                     border: btnBorder,
@@ -296,21 +306,13 @@ export default function Tools() {
                   }}
                   data-ocid={`tools.item.${idx + 1}.button`}
                 >
-                  {btnState === "processing" && (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  )}
-                  {btnState === "done" && <Check className="w-4 h-4" />}
                   {btnState === "locked" && <Lock className="w-4 h-4" />}
                   <span>
-                    {btnState === "processing"
-                      ? "Processing..."
-                      : btnState === "done"
-                        ? "Done ✓"
-                        : btnState === "locked"
-                          ? "Upgrade to Pro"
-                          : btnState === "guest"
-                            ? "Try Free Now"
-                            : "Launch Tool →"}
+                    {btnState === "locked"
+                      ? "Upgrade to Pro"
+                      : btnState === "guest"
+                        ? "Try Free Now"
+                        : "Launch Tool →"}
                   </span>
                 </button>
               </div>
@@ -321,6 +323,26 @@ export default function Tools() {
 
       <UpgradeModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+      <PngToPdfModal
+        open={pngToPdfOpen}
+        onClose={() => setPngToPdfOpen(false)}
+      />
+      <BgRemoverModal
+        open={bgRemoverOpen}
+        onClose={() => setBgRemoverOpen(false)}
+      />
+      <ImgEnhancerModal
+        open={imgEnhancerOpen}
+        onClose={() => setImgEnhancerOpen(false)}
+      />
+      <ImgGeneratorModal
+        open={imgGeneratorOpen}
+        onClose={() => setImgGeneratorOpen(false)}
+      />
+      <BulkConverterModal
+        open={bulkConverterOpen}
+        onClose={() => setBulkConverterOpen(false)}
+      />
     </section>
   );
 }

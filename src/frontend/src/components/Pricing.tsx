@@ -199,7 +199,7 @@ export default function Pricing() {
               ))}
             </ul>
             <a
-              href="https://buy.stripe.com/test_6oU28tbG62Jg5Ah3CA1VK00"
+              href="https://rzp.io/rzp/Tm89KFH5"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-gradient w-full py-3.5 rounded-xl text-white text-sm font-bold transition-all hover:scale-[1.02] flex items-center justify-center"
